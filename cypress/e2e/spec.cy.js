@@ -7,7 +7,7 @@ const menuPage = new MenuPage()
 const userManagementPage = new UserManagementPage()
 
 describe('Maintenance Release Suite', () => {
-    it('Login to Deploy application', () => {
+    it('Create user, assign role to user and give permissions', () => {
         loginPage.login('http://localhost:4516/', 'admin', 'admin')
         menuPage.navigateToExplorer()
         menuPage.navigateToUserManagement()
