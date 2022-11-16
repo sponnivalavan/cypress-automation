@@ -19,7 +19,7 @@ export default class ApplicationsPage {
     }
     undeployApplication(applicationName, environmentName) {
         cy.get('div.infinite-tree-item:nth-child(3) > div:nth-child(1) > a:nth-child(1)', {timeout: 10000}).click({force: true});
-      g  cy.get('i[data-id="Environments/' + environmentName + '"', {timeout: 10000}).click({force: true});
+        cy.get('i[data-id="Environments/' + environmentName + '"', {timeout: 10000}).click({force: true});
         cy.get('div.infinite-tree-item:nth-child(4) > div:nth-child(1) > a:nth-child(1)', {timeout: 10000}).click({force: true});
         cy.get('.infinite-tree-selected > .infinite-tree-node > .infinite-tree-toggler').click({force: true});
         cy.get('i[data-id="Environments/' + environmentName + '/' + applicationName + '"', {timeout: 10000}).click({force: true});
