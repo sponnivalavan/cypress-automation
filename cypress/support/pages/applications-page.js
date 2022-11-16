@@ -29,8 +29,10 @@ export default class ApplicationsPage {
 
         //Create Command Execution
         cy.viewport(1400, 700)
-        cy.get('div.infinite-tree-item:nth-child(3) > div:nth-child(1) > a:nth-child(1)', {timeout: 10000}).click({force: true});
-        cy.get('i[data-id="Applications/' + applicationName + '/' + deploymentPackageName + '"').click({force: true});
+        //cy.get('div.infinite-tree-item:nth-child(3) > div:nth-child(1) > a:nth-child(1)', {timeout: 10000}).click({force: true});
+        cy.get('i[data-id="Applications/' + applicationName + '"', {timeout: 10000}).click({force: true});
+        cy.get('.infinite-tree-selected > .infinite-tree-node > .infinite-tree-toggler').click({force: true});
+        cy.get('i[data-id="Applications/' + applicationName + '/' + deploymentPackageName + '"', {timeout: 10000}).click({force: true});
         cy.get('.new > a:nth-child(1)').click()
         cy.get('.cmd > a:nth-child(1) > span:nth-child(2)').click()
         cy.get('.command > span:nth-child(2)').click()
