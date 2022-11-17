@@ -4,6 +4,8 @@ import EnvironmentsPage from '../support/pages/environments-page'
 import InfrastructurePage from "../support/pages/infrastructure-page";
 import ApplicationsPage from "../support/pages/applications-page";
 import DeployApplicationPage from "../support/pages/deploy-applications-page";
+import ReportsPage from "../support/pages/reports-page";
+import { report } from 'process';
 
 const loginPage = new LoginPage()
 const menuPage = new MenuPage()
@@ -11,9 +13,10 @@ const environmentsPage = new EnvironmentsPage()
 const infrastructurePage = new InfrastructurePage()
 const applicationsPage = new ApplicationsPage()
 const deployApplicationPage = new DeployApplicationPage()
+const reportsPage = new ReportsPage()
 
 describe('Maintenance Release Suite', () => {
-    it('Deployment of applications', () => {
+   /* it('Deployment of applications', () => {
         loginPage.login('http://localhost:4516/', 'admin', 'admin')
 
         //Create Localhost Windows Infrastructure
@@ -34,7 +37,7 @@ describe('Maintenance Release Suite', () => {
         deployApplicationPage.deployApplication(applicationName, environmentName)
         deployApplicationPage.undeployApplication(applicationName, environmentName)
 
-    })
+    }) */
 
 
 
@@ -48,4 +51,16 @@ describe('Maintenance Release Suite', () => {
         userManagementPage.navigateToPermissions()
         userManagementPage.assignPermissionsToRole(roleName)
     })*/
+
+    it('Reports', () => {
+        loginPage.login('http://localhost:4516/', 'admin', 'admin')
+        menuPage.navigateToExplorer()
+        menuPage.navigateToReports()
+        reportsPage.navigateToDeployment()
+        reportsPage.clickSearch()
+        reportsPage.clickInitial()
+        reportsPage.clickRollback()
+        reportsPage.clickUndeploy()
+        reportsPage.clickUpgrade()
+})
 })
