@@ -1,13 +1,7 @@
 export default class LoginPage {
-    login(hostname, username, password) {
-        cy.visit(hostname)
-        cy.get('input[name=username]').should('be.visible').type(username)
-        cy.get('input[name=password]').should('be.visible').type(password)
-        cy.get('button[type=submit]').click({force: true});
-    }
-
-    logout() {
-        cy.get('button[color="default"]').click()
-        cy.get('.logOut > span:nth-child(2)').click()
-    }
+    inputBoxUserName = 'input[name=username]'
+    inputBoxPassword = 'input[name=password]'
+    buttonSubmit = 'button[type=submit]'
+    buttonAvatar = 'span.dot-typography'
+    linklogout = '.logOut > span:nth-child(2)'
 }
