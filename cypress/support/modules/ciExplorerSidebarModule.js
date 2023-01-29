@@ -4,12 +4,12 @@ const ciExplorerSidebarPage = new CIExplorerSidebarPage()
 
 export default class CIExplorerSidebarModule {
     navigateToExplorer() {
-        cy.get(ciExplorerSidebarPage.iconBack).click({force: true});
+        ciExplorerSidebarPage.getIconBack().click()
     }
 
     navigateToExplorerFromUserManagement() {
-        cy.get(ciExplorerSidebarPage.iconBack).click({force: true});
-        cy.get(ciExplorerSidebarPage.iconTree).click({force: true});
+        ciExplorerSidebarPage.getIconBack().click({force: true});
+        ciExplorerSidebarPage.getIconTree().click({force: true});
     }
 
     navigateToReports() {
@@ -21,23 +21,23 @@ export default class CIExplorerSidebarModule {
     }
 
     navigateToUserManagement() {
-        cy.contains('User management').click({force: true});
+        ciExplorerSidebarPage.getListUserManagement().click()
     }
 
     navigateToSettings() {
-        cy.get(ciExplorerSidebarPage.iconSettings).click({force: true});
-        cy.get(ciExplorerSidebarPage.menuSettings).click({force: true});
+        ciExplorerSidebarPage.getIconSettings().click()
+        ciExplorerSidebarPage.getMenuSettings().click()
     }
 
     navigateToFeatures() {
-        cy.get(ciExplorerSidebarPage.menuFeatures).click();
+        ciExplorerSidebarPage.getMenuFeatures().click()
     }
 
     navigateToMonitoring() {
-        cy.get(ciExplorerSidebarPage.menuMonitoring).click();
+        ciExplorerSidebarPage.getMenuMonitoring().click();
     }
 
     navigateToMonitoringControlTasks() {
-        cy.get(ciExplorerSidebarPage.menuMonitoringControlTasks).dblclick()
+        ciExplorerSidebarPage.getMenuMonitoringControlTasks().dblclick()
     }
 }

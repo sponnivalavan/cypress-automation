@@ -41,55 +41,74 @@ const infraPage = new InfrastructurePage()
 const deployApplicationModule = new DeployApplicationModule()
 const deployApplicationPage = new DeployApplicationPage()
 
-describe('Maintenance Release Suite', () => {
+describe('Maintenance Release Test Suite', () => {
 
     beforeEach(() => {
-        //Login to application
-        loginModule.login('http://localhost:4516/', 'admin', 'admin')
+        // Login to application
+        loginModule.login(Cypress.env('hostname'), Cypress.env('username'), Cypress.env('password'))
     })
 
-    it('TC: 1 - Verify login screen customization with message', () => {
-        //Navigate to Settings page and add login screen message
+    it('Verify login screen customization with message', () => {
+        // Verify the login page does not display any message by default
+        loginPage.getAuthMessage().should('not.exist');
+
+        // Navigate to Settings page and add login screen message
         ciExplorerSideBarModule.navigateToSettings()
-        settingsModule.addLoginScreenMessage("Test")
+        settingsModule.addLoginScreenMessage('welcome to digital.ai')
+
+        // Logout of the application and on login screen verify if the message is displayed
         loginModule.logout()
-        cy.get('.auth-message').contains("Test")
+        loginPage.getAuthMessage().contains('welcome to digital.ai')
+
+        // Login as admin and remove the message and verify if the message does not appear in login screen
+        loginModule.login(Cypress.env('hostname'), Cypress.env('username'), Cypress.env('password'))
+        ciExplorerSideBarModule.navigateToSettings()
+        settingsModule.removeLoginScreenMessage()
+        loginModule.logout()
+        loginPage.getAuthMessage().should('not.exist');
     })
 
-    it('TC: 2 - XLD-Deployment:Verify that admin user can not delete admin user', () => {
+    it('Verify that admin user can not delete admin user', () => {
+        // Go to user management option and see that no delete option for admin user
         ciExplorerSideBarModule.navigateToExplorer()
         ciExplorerSideBarModule.navigateToUserManagement()
-        cy.get('table tbody tr').filter(':has(td:nth-child(1):contains("admin"))')
-            .filter(':has(td:nth-child(2):contains("Edit"))').and('not.include.text', "Delete").and('include.text', "Edit")
+        ciExplorerSidebarPage.getAdminUserNoDeleteOption()
     })
 
-    it('TC: 3 - Verify is stitch section is displayed', () => {
+    it('Verify is stitch section is displayed', () => {
         ciExplorerSideBarModule.navigateToExplorer()
-        cy.get(ciExplorerSidebarPage.titleStitch).contains('Stitch')
-        cy.get(ciExplorerSidebarPage.listRulesandMacros).contains('Rules and Macros')
-        cy.get(ciExplorerSidebarPage.listGitOps).contains('GitOps')
-        cy.get(ciExplorerSidebarPage.listLocalSources).contains('Local sources')
+        // Verify if stitch available by admin in default
+        ciExplorerSidebarPage.getTitleStitch().contains('Stitch')
+
+        // Verify rules and macros is available
+        ciExplorerSidebarPage.getListGitOps().contains('GitOps')
+
+        // Verify if Local sources is available
+        ciExplorerSidebarPage.getListLocalSources().contains('Local sources')
+
+        // Verify if gitops is available
+        ciExplorerSidebarPage.getListRulesAndMacros().contains('Rules and Macros')
     })
 
-    it('TC: 4 - XLD-Validate settings tab for deploy', () => {
+    it('Validate settings tab for deploy', () => {
         //Navigate to Settings
         ciExplorerSideBarModule.navigateToSettings()
 
-        //Change Header color
-        cy.get(settingsPage.textColor).click()
-        cy.get(settingsPage.selectColor).click()
+        // Change the header color to different colors
+        settingsPage.getTextColor().click()
+        settingsPage.getSelectColor().click()
 
-        //Add Instance Name and verify its available in top left side
-        cy.get(settingsPage.inputInstanceName).clear().type("xlr_prod")
-        cy.get(settingsPage.buttonSave).contains('Save').click()
-        cy.get(settingsPage.labelHeader).contains('xlr_prod')
+        // Provide a Instance Name e.g. xld_prod and hit save
+        settingsPage.getInputInstanceName().clear().type("xlr_prod")
+        settingsPage.getButton().contains('Save').click()
+        settingsPage.getLabelHeader().contains('xlr_prod')
     })
 
-    it('TC: 5 - Verify Logo file is displayed in settings tab', () => {
+    it('Verify Logo file is displayed in settings tab', () => {
         //Navigate to Settings page, check save button disabled and digital ai image logo displayed
         ciExplorerSideBarModule.navigateToSettings()
-        cy.get(settingsPage.buttonSave).contains('Save').should('be.disabled')
-        cy.get('div').find('img').should('have.attr', 'src').should('include', 'ciExplorerDist/libs/images/deploy-logo-5506ebfd2a8b504f81b5ba636d1746ca.svg')
+        settingsPage.getButton().contains('Save').should('be.disabled')
+        settingsPage.getLogoImage()
 
         //New logo file to be uploaded and displayed
         const filepath = 'cypress/fixtures/test1.jpg'
@@ -97,53 +116,101 @@ describe('Maintenance Release Suite', () => {
         settingsModule.clearLogoFile()
     })
 
-    it('TC: 6 - Verify Features is present in settings tab', () => {
-        //Navigate to User Management
+    it('Verify Features is present in settings tab', () => {
+        //Navigate to Settings and verify Features tab available
         ciExplorerSideBarModule.navigateToSettings()
         ciExplorerSideBarModule.navigateToFeatures()
+
+        // Verify Analytics and guidance is enabled by default.
+        settingsPage.getCheckAnalyticsGuidance().uncheck().should('not.be.checked')
+        settingsPage.getButtonFeaturesSave().contains('Save').click()
         cy.wait(3000)
-        cy.get(settingsPage.checkAnalyticsGuidance).uncheck().should('not.be.checked');
-        cy.get(settingsPage.checkAllowUsersOptOut).check().should('be.checked');
-        cy.get(settingsPage.buttonFeaturesSave).contains('Save').click({force: true})
-        cy.wait(3000)
-        cy.get(loginPage.buttonAvatar).click({force: true})
-        cy.get(settingsPage.linkUserProfile).click({force: true})
-        cy.get(settingsPage.titleProductAnalyticsGuidance).contains('Product analytics and guidance')
-        cy.get(settingsPage.checkUserProfileAnalyticsGuidance).should('be.checked');
+
+        //Verify help link near product analytics and guidance takes to documentation page of xl-deploy on click.
+        loginPage.getAvatarButton().click()
+        settingsPage.getLinkUserProfile().click()
     })
 
-    it('TC: 7 - Verify list displayed in settings icons perform actions as expected', () => {
-        //List under settings is displayed as expected
-        cy.get(ciExplorerSidebarPage.iconSettings).click({force: true});
-        cy.get(settingsPage.menuSettings).contains('Settings')
-        cy.get(settingsPage.menuSettingsRenewLicense).contains('Renew license')
-        cy.get(settingsPage.menuSettingsViewAs).contains('View as')
-        cy.get(settingsPage.menuSettingsMaintenanceMode).contains('Maintenance mode')
-        cy.get(settingsPage.menuSettingsAbout).contains('About')
-        cy.get(settingsPage.menuSettingsSysInfo).contains('System information')
+    it('Verify Pendo toggle for user profile', () => {
+        //Navigate to Settings and verify Features tab available
+        ciExplorerSideBarModule.navigateToSettings()
+        ciExplorerSideBarModule.navigateToFeatures()
 
-        //About and system information displays as expected
-        cy.get(settingsPage.linkAbout).click({force: true})
+        // Verify Allow users to opt-out option is available and disabled by default
+        settingsPage.getCheckAllowUsersOptOut().check().should('be.checked')
+        settingsPage.getButtonFeaturesSave().contains('Save').click()
+        cy.wait(3000)
+
+        //Verify help link near product analytics and guidance takes to documentation page of xl-deploy on click.
+        loginPage.getAvatarButton().click()
+        settingsPage.getLinkUserProfile().click()
+        settingsPage.getTitleProductAnalyticsGuidance().contains('Product analytics and guidance')
+        settingsPage.getCheckProfileAnalyticsGuidance().should('be.checked')
+    })
+
+    it('Verify list displayed in settings icons perform actions as expected', () => {
+        // Click on settings in top right corner and verify below list is displayed
+        ciExplorerSidebarPage.getIconSettings().click()
+        settingsPage.getMenuSettings().contains('Settings')
+        settingsPage.getMenuSettingsRenewLicense().contains('Renew license')
+        settingsPage.getMenuSettingsViewAs().contains('View as')
+        settingsPage.getMenuSettingsMaintenanceMode().contains('Maintenance mode')
+        settingsPage.getMenuSettingsAbout().contains('About')
+        settingsPage.getMenuSettingsSysInfo().contains('System information')
+
+        // Verify if about and system information displays information as expected
+        settingsPage.getLinkAbout().click()
         cy.window().then(function (p) {
-            cy.get(settingsPage.titleAbout).contains('About')
-            cy.get(settingsPage.textServerVersion).contains('Server version:')
-            cy.get(settingsPage.iconCloseAboutWindow).click({force: true})
+            settingsPage.getTitleAbout().contains('About')
+            settingsPage.getTextServerVersion().contains('Server version:')
+            settingsPage.getIconCloseAboutWindow().click()
         })
-
-        cy.get(ciExplorerSidebarPage.iconSettings).click({force: true});
-        cy.get(settingsPage.menuSettingsSysInfo).click({force: true})
+        ciExplorerSidebarPage.getIconSettings().click()
+        settingsPage.getMenuSettingsSysInfo().click()
         cy.window().then(function (p) {
-            cy.get(settingsPage.titleSysInfo).contains('System information')
-            cy.get(settingsPage.textSysInfo).contains('Deploy system information')
-            cy.get(settingsPage.iconCloseAboutWindow).click({force: true})
+            settingsPage.getTitleSysInfo().contains('System information')
+            settingsPage.getTextSysInfo().contains('Deploy system information')
+            settingsPage.getIconCloseAboutWindow().click()
         })
 
         //Check help link and docs page working
-        cy.get(settingsPage.iconHelp).click({force: true});
-        cy.get(settingsPage.linkOnlineDoc).should('have.attr', 'href', 'https://docs.xebialabs.com')
+        settingsPage.getIconHelp().click()
+        settingsPage.getLinkOnlineDoc().should('have.attr', 'href', 'https://docs.xebialabs.com')
     })
 
-    it('TC: 8 - XLD-Verify that User with deploy_admin_read_only role shall have view permission for XLD', () => {
+    it('Verify password strength criteria in GUI', () => {
+        // Login as admin and navigate to user management and create new user
+        ciExplorerSideBarModule.navigateToExplorer()
+        ciExplorerSideBarModule.navigateToUserManagement()
+        var userName = userManagementModule.addUser()
+        userManagementModule.navigateToRoles()
+        var roleName = userManagementModule.addRoleToUser(userName)
+
+        //give global permissions for login and report view
+        ciExplorerSideBarModule.navigateToUserManagement()
+        userManagementModule.navigateToPermissions()
+        userManagementModule.assignLoginAndReportPermissionsToRole(roleName)
+
+        // Logout and login as created user
+        loginModule.logout()
+        var password = userName + "U1"
+        console.log("password:" + password)
+        loginModule.login(Cypress.env('hostname'), userName, password)
+
+        // Login as admin and change password to the user
+        loginModule.logout()
+        loginModule.login(Cypress.env('hostname'), Cypress.env('username'), Cypress.env('password'))
+        ciExplorerSideBarModule.navigateToExplorer()
+        ciExplorerSideBarModule.navigateToUserManagement()
+        userManagementModule.changePassword(userName)
+
+        // Verify user is able to login to GUI with new password
+        loginModule.logout()
+        var password = userName + "P2"
+        loginModule.login(Cypress.env('hostname'), userName, password)
+    })
+
+    it('Verify that User with deploy_admin_read_only role shall have view permission for XLD', () => {
         //Create User, Role, Assign Role to user and give deploy permissions
         ciExplorerSideBarModule.navigateToExplorer()
         ciExplorerSideBarModule.navigateToUserManagement()
@@ -154,40 +221,43 @@ describe('Maintenance Release Suite', () => {
         //Logout and login as non admin user
         loginModule.logout()
         var password = userName + "U1"
-        loginModule.login('http://localhost:4516/', userName, password)
-        cy.get(settingsPage.iconClosePendo).click({force: true});
+        loginModule.login(Cypress.env('hostname'), userName, password)
+        settingsPage.getIconClosePendo().click()
         cy.wait(5000)
 
         var checkAppPermissions = appModule.checkAppPermissions()
 
         //re-login as admin and unassign the permissions
         loginModule.logout()
-        loginModule.login('http://localhost:4516/', 'admin', 'admin')
+        loginModule.login(Cypress.env('hostname'), Cypress.env('username'), Cypress.env('password'))
         ciExplorerSideBarModule.navigateToExplorer()
         ciExplorerSideBarModule.navigateToUserManagement()
         userManagementModule.navigateToRoles()
         userManagementModule.unassigndeployAdminReadRoleToUser()
     })
 
-    it.skip('TC: 9 - Verify if plugins can be installed', () => {
-        //Navigate to User Management
-        ciExplorerSideBarModule.navigateToExplorer()
-        ciExplorerSideBarModule.navigateToPlugins()
-        cy.wait(3000)
-        cy.get(ciExplorerSidebarPage.buttonPluginsInstall).click({force: true})
-        cy.wait(3000)
+    it('Applications:Create CMD application package', () => {
+        // Create new application
+        var appName = appModule.createApp()
+
+        // Create new deployment package inside the above created application
+        var appDepPkgName = appModule.createAppDepPkg(appName)
+
+        // Create new multiple cmd type applications inside package
+        var cmd1 = "systeminfo"
+        var appCmdExe = appModule.createAppCmdExe(appName, appDepPkgName, cmd1)
+        var cmd2 = "dir"
+        var appCmdExe = appModule.createAppCmdExe(appName, appDepPkgName, cmd2)
     })
 
-    it('TC: 10 - XLD-Applications:Create CMD application package and ' +
-        'TC: 11 - XLD-Deployment:Update deployment and verify the task', () => {
-        //Create Localhost Windows Infrastructure
+    it('Deployment:Update deployment and verify the task', () => {
+        // Create localhost in infrastructure ci
         var infraName = infraModule.createInfra()
-        cy.log("Infrastructure Name:" + infraName)
 
-        //Create Environment with the infrastrucutre created
+        // Create an environment for above created localhost
         var envName = envModule.createEnv(infraName)
 
-        //Create Application
+        // Create application package of cmd type
         var appName = appModule.createApp()
         var appDepPkgName = appModule.createAppDepPkg(appName)
         var cmd1 = "systeminfo"
@@ -210,23 +280,23 @@ describe('Maintenance Release Suite', () => {
         deployApplicationModule.undeployApplication(appName, envName)
     })
 
-    //Case 6 not working.
-    it.skip('TC: 6 - XLD-Monitoring_control all task should display only tasks with permission', () => {
-        //Create User, Role, Assign Role to user and give deploy permissions
+    it('Monitoring_control all task should display only tasks with permission', () => {
+        // Create User, Role, Assign Role to user
         ciExplorerSideBarModule.navigateToExplorer()
         ciExplorerSideBarModule.navigateToUserManagement()
         var userName = userManagementModule.addUser()
         userManagementModule.navigateToRoles()
         var roleName = userManagementModule.addRoleToUser(userName)
 
-        //give local permissions for infra, environment and application.
+        //Give local permissions for infra, environment and application.
         cy.wait(3000)
         ciExplorerSideBarModule.navigateToExplorerFromUserManagement()
         infraModule.assignInfraPermissionsToRole(roleName)
         envModule.assignEnvPermissionsToRole(roleName)
-        envModule.assignAppPermissionsToRole(roleName)
+        appModule.assignAppPermissionsToRole(roleName)
 
-        //give global permissions for login and report view
+        // Give global permissions for login and report view
+        ciExplorerSideBarModule.navigateToExplorer()
         ciExplorerSideBarModule.navigateToUserManagement()
         userManagementModule.navigateToPermissions()
         userManagementModule.assignLoginAndReportPermissionsToRole(roleName)
@@ -239,23 +309,23 @@ describe('Maintenance Release Suite', () => {
         infraModule.navigateToInfraDirectory(infraDirName)
 
         //Give permissions to the user for the directory
-        //userManagementPage.assignInfraDirPerToRole(roleName)
-
-        //Create a new infrastructure globally.
-        var infraName = infraModule.createInfra()
+        //serManagementModule.assignInfraDirPerToRole(roleName)
 
         //Create a new infrastructure inside the directory.
         var localInfraName = infraModule.createInfraInsideDirectory(infraDirName)
+
+        //Create a new infrastructure globally.
+        var infraName = infraModule.createInfra()
 
         //Execute control task for global infra
         infraModule.executeControlTask(infraName)
 
         //Logout and login as created user to xld
         loginModule.logout()
+        cy.wait(5000)
         var password = userName + "U1"
-        loginModule.login('http://localhost:4516/', userName, password)
+        loginModule.login(Cypress.env('hostname'), userName, password)
         cy.wait(3000)
-        //cy.wait(5000)
         cy.get('._pendo-close-guide').click({force: true});
         cy.wait(5000)
 
@@ -270,25 +340,25 @@ describe('Maintenance Release Suite', () => {
         cy.get('td.tasks-table-state > span:nth-child(1)').contains('Executed')
     })
 
-    it('TC: 12 - XLD-Monitoring:Verify  "Type" filter functionality for Deployment tasks in Monitoring tab', () => {
+    it('Monitoring:Verify  "Type" filter functionality for Deployment tasks in Monitoring tab', () => {
         ciExplorerSideBarModule.navigateToExplorer()
         ciExplorerSideBarModule.navigateToReports()
         reportsModule.navigateToDeployments()
         reportsModule.filterInitialDeployment()
-        cy.wait(3000)
-        cy.get(reportsPage.tblDeploymentStatus).contains('Initial')
+        cy.wait(2000)
+        reportsPage.getTableDeploymentStatus().contains('Initial')
         reportsModule.filterRollbackDeployment()
-        cy.wait(3000)
-        cy.get(reportsPage.tblDeploymentStatus).contains('Rollback')
+        cy.wait(2000)
+        reportsPage.getTableDeploymentStatus().contains('Rollback')
         reportsModule.filterUndeployDeployment()
-        cy.wait(3000)
-        cy.get(reportsPage.tblDeploymentStatus).contains('Undeploy')
+        cy.wait(2000)
+        reportsPage.getTableDeploymentStatus().contains('Undeploy')
         reportsModule.filterUpgradeDeployment()
-        cy.wait(3000)
-        cy.get(reportsPage.tblDeploymentStatus).contains('Update')
+        cy.wait(2000)
+        reportsPage.getTableDeploymentStatus().contains('Update')
     })
 
-    it('TC: 13 - XLD-Reports:Verify schedule of a control task(Rescan Artifact)', () => {
+    it('Reports:Verify schedule of a control task(Rescan Artifact)', () => {
         //Create Application
         var appName = appModule.createApp()
         var appDepPkgName = appModule.createAppDepPkg(appName)
@@ -304,9 +374,49 @@ describe('Maintenance Release Suite', () => {
         monitoringModule.executeControlTasks(appName, appDepPkgName, fileName)
     })
 
-    it('TC: 14 - Deploy an application from non admin user' +
-        'TC: 15 - XLD-Verify password strength criteria in GUI' +
-        'TC: 16 - XLD-User-Management:Create user, assign role and various permissions to user', () => {
+    it('User-Management:Create user, assign role and various permissions to user', () => {
+        //Add a User
+        cy.wait(3000)
+        ciExplorerSideBarModule.navigateToExplorer()
+        ciExplorerSideBarModule.navigateToUserManagement()
+        var userName = userManagementModule.addUser()
+
+        //Add a Role to user
+        userManagementModule.navigateToRoles()
+        var roleName = userManagementModule.addRoleToUser(userName)
+
+        //give local permissions for infra, environment and application.
+        cy.wait(3000)
+        ciExplorerSideBarModule.navigateToExplorerFromUserManagement()
+        infraModule.assignInfraPermissionsToRole(roleName)
+        envModule.assignEnvPermissionsToRole(roleName)
+        appModule.assignAppPermissionsToRole(roleName)
+
+        //Set login and reports view permissions on above role
+        ciExplorerSideBarModule.navigateToExplorer()
+        ciExplorerSideBarModule.navigateToUserManagement()
+        userManagementModule.navigateToPermissions()
+        userManagementModule.assignLoginAndReportPermissionsToRole(roleName)
+
+        //Logout and login as non admin user
+        loginModule.logout()
+        var password = userName + "U1"
+
+        loginModule.login(Cypress.env('hostname'), userName, password)
+        cy.wait(3000)
+        cy.get('._pendo-close-guide').click({force: true});
+        cy.wait(5000)
+
+        //Try accessing the user management section
+        ciExplorerSideBarModule.navigateToExplorer()
+        ciExplorerSidebarPage.getListUserManagement().should('not.exist')
+
+        //Access the reports dashboard
+        ciExplorerSideBarModule.navigateToReports()
+        ciExplorerSideBarModule.navigateToExplorerFromUserManagement()
+    })
+
+    it('Deploy an application from non admin user', () => {
         //Create User, Role, Assign Role to user and give deploy permissions
         cy.wait(3000)
         ciExplorerSideBarModule.navigateToExplorer()
@@ -323,6 +433,7 @@ describe('Maintenance Release Suite', () => {
         appModule.assignAppPermissionsToRole(roleName)
 
         //give global permissions
+        ciExplorerSideBarModule.navigateToExplorer()
         ciExplorerSideBarModule.navigateToUserManagement()
         userManagementModule.navigateToPermissions()
         userManagementModule.assignPermissionsToRole(roleName)
@@ -330,18 +441,16 @@ describe('Maintenance Release Suite', () => {
         //Logout and login as non admin user
         loginModule.logout()
         var password = userName + "U1"
-        loginModule.login('http://localhost:4516/', userName, password)
+        loginModule.login(Cypress.env('hostname'), userName, password)
         cy.wait(3000)
         cy.get('._pendo-close-guide').click({force: true});
         cy.wait(5000)
 
         //Create app, infra, environment and Deploy Applications
         var infraName = infraModule.createInfra()
-        cy.log("Infrastructure Name:" + infraName)
 
         //Create Environment with the infrastrucutre created
         var envName = envModule.createEnv(infraName)
-        cy.log("Environment Name:" + envName)
 
         //Create Application
         var appName = appModule.createApp()

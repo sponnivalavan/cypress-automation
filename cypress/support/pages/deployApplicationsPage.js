@@ -1,6 +1,17 @@
 export default class ApplicationsPage {
-    buttonDeploy = '.deploy > span:nth-child(2)'
-    button = 'button[type=button]'
-    buttonDeployAll = '.deploy'
-    buttonUndeploy = '.undeploy > span:nth-child(2)'
+    getButton() {
+        return cy.get('button[type=button]')
+    }
+
+    getButtonDeploy() {
+        return cy.get('.deploy > span:nth-child(2)')
+    }
+
+    getButtonUnDeploy() {
+        return cy.get('.undeploy > span:nth-child(2)')
+    }
+
+    getButtonDeployAll() {
+        return cy.get('.deploy')
+    }
 }
