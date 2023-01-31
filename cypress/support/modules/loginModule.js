@@ -2,16 +2,15 @@ import LoginPage from '../pages/loginPage'
 
 const loginPage = new LoginPage()
 export default class LoginModule {
-
     login(hostname, username, password) {
-        cy.visit(hostname)
-        cy.get(loginPage.inputBoxUserName).should('be.visible').type(username)
-        cy.get(loginPage.inputBoxPassword).should('be.visible').type(password)
-        cy.get(loginPage.buttonSubmit).click({force: true})
+        loginPage.visit(hostname)
+        loginPage.getLoginUserName().type(username)
+        loginPage.getLoginPassword().type(password)
+        loginPage.getLoginSubmit().click()
     }
 
     logout() {
-        cy.get(loginPage.buttonAvatar).click()
-        cy.get(loginPage.linklogout).click()
+        loginPage.getAvatarButton().click()
+        loginPage.getLogout().click()
     }
 }

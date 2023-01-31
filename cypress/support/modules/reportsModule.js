@@ -4,33 +4,33 @@ const reportsPage = new ReportsPage()
 export default class reportsModule {
 
     navigateToDeployments() {
-        cy.get(reportsPage.listDeployments).click({force: true});
+        reportsPage.getListDeployments().click({force: true});
     }
 
     filterInitialDeployment() {
-        cy.get(reportsPage.searchDeployments).click({force: true});
-        cy.get(reportsPage.checkInitialDeployment).click({force: true});
-        cy.get(reportsPage.clickBackToPage).click(0, 0)
+        reportsPage.getSearchDeployments().click({force: true})
+        reportsPage.getCheckInitialDeployment().click({force: true})
+        reportsPage.getLinkClickBackToPage().click(0, 0)
     }
 
     filterRollbackDeployment() {
-        cy.get(reportsPage.inputSearchDeployment).click()
-        cy.get(reportsPage.checkInitialDeployment).click({force: true});
-        cy.get(reportsPage.checkRollbackDeployment).click({force: true});
-        cy.get(reportsPage.clickBackToPage).click(0, 0)
+        reportsPage.getInputSearchDeployment().click()
+        reportsPage.getCheckInitialDeployment().click({force: true})
+        reportsPage.getCheckRollbackDeployment().click({force: true})
+        reportsPage.getLinkClickBackToPage().click(0, 0)
     }
 
     filterUndeployDeployment() {
-        cy.get(reportsPage.inputSearchDeployment).click()
-        cy.get(reportsPage.checkRollbackDeployment).click({force: true});
-        cy.get(reportsPage.checkUndeployDeployment).click({force: true});
-        cy.get(reportsPage.clickBackToPage).click(0, 0)
+        reportsPage.getInputSearchDeployment().click()
+        reportsPage.getCheckRollbackDeployment().click({force: true})
+        reportsPage.getCheckUndeployDeployment().click({force: true})
+        reportsPage.getLinkClickBackToPage().click(0, 0)
     }
 
     filterUpgradeDeployment() {
-        cy.get(reportsPage.inputSearchDeployment).click()
-        cy.get(reportsPage.checkUndeployDeployment).click({force: true});
-        cy.get(reportsPage.checkUpgradeDeployment).click({force: true});
-        cy.get(reportsPage.clickBackToPage).click(0, 0)
+        reportsPage.getInputSearchDeployment().click()
+        reportsPage.getCheckUndeployDeployment().click({force: true})
+        reportsPage.getCheckUpgradeDeployment().click({force: true})
+        reportsPage.getLinkClickBackToPage().click(0, 0)
     }
 }

@@ -7,13 +7,12 @@ const applicationsPage = new ApplicationsPage()
 export default class ApplicationsModule {
     createApp(appName) {
         //Create Application
-        cy.get(applicationsPage.iconApplication, {timeout: 10000}).click({force: true});
-        cy.get(applicationsPage.linkNewApp).click()
-        cy.get(applicationsPage.linkApp).click()
+        cy.get(applicationsPage.getIconApplication(), {timeout: 10000}).click({force: true})
+        applicationsPage.getLinkNewApp().click()
+        applicationsPage.getLinkApp().click()
         var appName = UtilsModule.generate_random_string(5)
-        cy.get(applicationsPage.inputAppName).type(appName)
-        cy.get(applicationsPage.buttonSave).click({force: true}).click({force: true});
-        cy.log('appname:' + appName)
+        applicationsPage.getInputAppName().type(appName)
+        applicationsPage.getButtonSave().click({force: true}).click({force: true});
         cy.wait(3000)
         cy.viewport(1400, 700)
         return appName
@@ -21,23 +20,23 @@ export default class ApplicationsModule {
 
     checkAppPermissions(appName) {
         //Create Application
-        cy.get(applicationsPage.iconApplication, {timeout: 10000}).click({force: true});
+        cy.get(applicationsPage.getIconApplication(), {timeout: 10000}).click({force: true})
         cy.wait(3000)
-        cy.get(applicationsPage.linkAppPermissionDisabled).should('be.visible')
-        cy.get(applicationsPage.linkViewPermissions).should('not.be.disabled')
+        applicationsPage.getLinkAppPermissionDisabled().should('be.visible')
+        applicationsPage.getLinkViewPermissions().should('not.be.disabled')
     }
 
     createAppDepPkg(appName) {
         //Create Application Deployment Package
         cy.viewport(1400, 700)
         cy.get('div.infinite-tree-item:nth-child(2) > div:nth-child(1) > a:nth-child(1)', {timeout: 20000}).click({force: true});
-        cy.get(applicationsPage.iconApplication + "/" + appName + '"', {timeout: 10000}).click({force: true});
+        cy.get(applicationsPage.getIconApplication() + "/" + appName + '"', {timeout: 10000}).click({force: true})
         cy.wait(3000)
-        cy.get(applicationsPage.linkNewApp).click()
-        cy.get(applicationsPage.linkNewDepPkg).click()
+        applicationsPage.getLinkNewApp().click()
+        applicationsPage.getLinkNewDepPkg().click()
         cy.viewport(1400, 1000)
         var depPkgName = "Initial-" + UtilsModule.generate_random_string(7)
-        cy.get(applicationsPage.inputAppName).clear().type(depPkgName)
+        applicationsPage.getInputAppName().clear().type(depPkgName)
         cy.wait(3000)
         cy.contains('Save and close').click({force: true});
         cy.wait(3000)
@@ -46,14 +45,14 @@ export default class ApplicationsModule {
 
     createAppDepPkgUpgrade(appName) {
         //Create Application Deployment Package for Upgrade
-        cy.get(applicationsPage.iconApplication, {timeout: 10000}).click({force: true});
+        cy.get(applicationsPage.getIconApplication(), {timeout: 10000}).click({force: true})
         cy.wait(2000)
-        cy.get(applicationsPage.iconApplication + "/" + appName + '"', {timeout: 10000}).click({force: true});
-        cy.get(applicationsPage.linkNewApp).click()
-        cy.get(applicationsPage.linkNewDepPkg).click()
+        cy.get(applicationsPage.getIconApplication() + "/" + appName + '"', {timeout: 10000}).click({force: true})
+        applicationsPage.getLinkNewApp().click()
+        applicationsPage.getLinkNewDepPkg().click()
         cy.viewport(1400, 1000)
         var depPkgName = "Upgrade-" + UtilsModule.generate_random_string(7)
-        cy.get(applicationsPage.inputAppName).clear().type(depPkgName)
+        applicationsPage.getInputAppName().clear().type(depPkgName)
         cy.wait(3000)
         cy.contains('Save and close').click({force: true});
         cy.wait(3000)
@@ -63,32 +62,32 @@ export default class ApplicationsModule {
     createAppCmdExe(appName, depPkgName, cmd) {
         //Create Command Execution
         cy.viewport(1400, 700)
-        cy.get(applicationsPage.selectAppTree).click({force: true});
-        cy.get((applicationsPage.iconApplication) + '/' + appName + '/' + depPkgName + '"', {timeout: 20000}).click({force: true});
-        cy.get(applicationsPage.linkNew).click()
-        cy.get(applicationsPage.linkNewCmd).click()
-        cy.get(applicationsPage.selectCommand).click()
+        applicationsPage.getSelectAppTree().click({force: true});
+        cy.get(applicationsPage.getIconApplication() + "/" + appName + '/' + depPkgName + '"', {timeout: 20000}).click({force: true})
+        applicationsPage.getLinkNew().click()
+        applicationsPage.getLinkNewCmd().click()
+        applicationsPage.getSelectCommand().click()
         var cmdName = UtilsModule.generate_random_string(5)
-        cy.get(applicationsPage.inputAppName).type(cmdName)
-        cy.get(applicationsPage.textAreaAppCmd).type(cmd)
+        applicationsPage.getInputAppName().type(cmdName)
+        applicationsPage.getTextAreaAppCmd().type(cmd)
         cy.wait(2000)
-        cy.get(applicationsPage.buttonSave).click({force: true}).click({force: true});
+        applicationsPage.getButtonSave().click({force: true}).click({force: true});
         cy.wait(2000)
     }
 
     createAppFile(appName, depPkgName, filepath) {
         //Create Command Execution
         cy.viewport(1400, 700)
-        cy.get(applicationsPage.selectAppTree).click({force: true});
-        cy.get(applicationsPage.iconApplication + '/' + appName + '/' + depPkgName + '"', {timeout: 20000}).click({force: true});
-        cy.get(applicationsPage.linkNewApp).click()
-        cy.get(applicationsPage.linkNewFile).click()
-        cy.get(applicationsPage.menuFile).click()
+        applicationsPage.getSelectAppTree().click({force: true});
+        cy.get(applicationsPage.getIconApplication() + "/" + appName + '/' + depPkgName + '"', {timeout: 20000}).click({force: true})
+        applicationsPage.getLinkNewApp().click()
+        applicationsPage.getLinkNewFile().click()
+        applicationsPage.getMenuFile().click()
         var fileName = UtilsModule.generate_random_string(5)
-        cy.get(applicationsPage.inputAppName).type(fileName)
-        cy.get(applicationsPage.buttonBrowse).contains('Browse').click({force: true})
-        cy.get(applicationsPage.inputFileUpload).eq(0).selectFile(filepath, {force: true})
-        cy.get(applicationsPage.buttonSaveFile).contains('Save').click()
+        applicationsPage.getInputAppName().type(fileName)
+        applicationsPage.getButton().contains('Browse').click({force: true})
+        applicationsPage.getInputFileUpload().selectFile(filepath, {force: true})
+        applicationsPage.getButton().contains('Save').click()
         cy.wait(2000)
         return fileName
     }
@@ -96,43 +95,41 @@ export default class ApplicationsModule {
     createAppCmdExeForUpgrade(appName, depPkgName, cmd) {
         //Create Command Execution
         cy.viewport(1400, 700)
-        cy.get(applicationsPage.iconApplication, {timeout: 10000}).click({force: true});
+        cy.get(applicationsPage.getIconApplication(), {timeout: 10000}).click({force: true})
         cy.wait(2000)
-        cy.get(applicationsPage.iconApplication + '/' + appName + '"', {timeout: 20000}).click({force: true});
+        cy.get(applicationsPage.getIconApplication() + '/' + appName + '"', {timeout: 20000}).click({force: true})
         cy.wait(2000)
-        cy.get(applicationsPage.iconApplication + '/' + appName + '/' + depPkgName + '"', {timeout: 20000}).click({force: true});
-        cy.get(applicationsPage.linkNew).click()
-        cy.get(applicationsPage.linkNewCmd).click()
-        cy.get(applicationsPage.selectCommand).click()
+        cy.get(applicationsPage.getIconApplication() + '/' + appName + '/' + depPkgName + '"', {timeout: 20000}).click({force: true})
+        applicationsPage.getLinkNew().click()
+        applicationsPage.getLinkNewCmd().click()
+        applicationsPage.getSelectCommand().click()
         var cmdName = UtilsModule.generate_random_string(5)
-        cy.get(applicationsPage.inputAppName).type(cmdName)
-        cy.get(applicationsPage.textAreaAppCmd).type(cmd)
+        applicationsPage.getInputAppName().type(cmdName)
+        applicationsPage.getTextAreaAppCmd().type(cmd)
         cy.wait(2000)
-        cy.get(applicationsPage.buttonSave).click({force: true}).click({force: true});
+        applicationsPage.getButtonSave().click({force: true})
+        cy.wait(2000)
     }
 
     rescanArtifact(appName, depPkgName, filename) {
-        cy.get(applicationsPage.iconApplication + '/' + appName + '"', {timeout: 20000}).click({force: true});
+        cy.get(applicationsPage.getIconApplication() + '/' + appName + '"', {timeout: 20000}).click({force: true})
         cy.wait(2000)
-        cy.get(applicationsPage.iconApplication + appName + '/' + depPkgName + '"', {timeout: 20000}).click({force: true});
-        cy.get(applicationsPage.selectAppTree).click({force: true});
-        cy.get(applicationsPage.iconApplication + appName + '/' + depPkgName + '/' + filename + '"', {timeout: 20000}).click({force: true});
-        cy.get(applicationsPage.rescanArtifact()).click({force: true});
-        cy.get(applicationsPage.selectSchedule).click({force: true});
+        cy.get(applicationsPage.getIconApplication() + '/' + appName + '/' + depPkgName + '"', {timeout: 20000}).click({force: true})
+        applicationsPage.getSelectAppTree().click({force: true});
+        cy.get(applicationsPage.getIconApplication() + '/' + appName + '/' + depPkgName + '/' + filename + '"', {timeout: 20000}).click({force: true})
+        applicationsPage.getLinkRescanArtifact().click({force: true});
+        applicationsPage.getSelectSchedule().click({force: true});
         cy.wait(5000)
-        cy.get(applicationsPage.buttonSchedule).click({force: true});
+        applicationsPage.getButtonSchedule().click({force: true});
         cy.wait(5000)
     }
 
     assignAppPermissionsToRole(roleName) {
-        cy.get(applicationsPage.iconApplication, {timeout: 10000}).click({force: true});
-        cy.get(applicationsPage.linkAppEditPermissions).click()
-        cy.get(`.permissions-pagination-table-component-${roleName}-1 > input:nth-child(1)`).click()
-        cy.get(`.permissions-pagination-table-component-${roleName}-2 > input:nth-child(1)`).click()
-        cy.get(`.permissions-pagination-table-component-${roleName}-3 > input:nth-child(1)`).click()
-        cy.get(`.permissions-pagination-table-component-${roleName}-4 > input:nth-child(1)`).click()
-        cy.get(`.permissions-pagination-table-component-${roleName}-5 > input:nth-child(1)`).click()
-        cy.get(`.permissions-pagination-table-component-${roleName}-6 > input:nth-child(1)`).click()
-        cy.get(applicationsPage.buttonSaveAndClose).click();
+        cy.get(applicationsPage.getIconApplication(), {timeout: 10000}).click({force: true})
+        applicationsPage.getLinkAppEditPermissions().click()
+        for (let i = 1; i <= 6; i++) {
+            cy.get(`.permissions-pagination-table-component-${roleName}-${i} > input:nth-child(1)`).click()
+        }
+        applicationsPage.getButtonSaveClose().click();
     }
 }

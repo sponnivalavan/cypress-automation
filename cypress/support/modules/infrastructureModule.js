@@ -6,34 +6,34 @@ const infrastructurePage = new InfrastructurePage()
 
 export default class infrastructureModule {
     createInfra() {
-        cy.contains('Infrastructure', {timeout: 50000}).click({force: true});
-        cy.get(infrastructurePage.iconInfrastrucutre).click({force: true});
-        cy.get(infrastructurePage.linkNew).click()
-        cy.get(infrastructurePage.linkOverthere).click()
-        cy.get(infrastructurePage.linkLocalHost).click()
+        infrastructurePage.getTitleInfrastructure().click({force: true})
+        infrastructurePage.getIconInfrastructure().click({force: true})
+        infrastructurePage.getLinkNew().click()
+        infrastructurePage.getLinkOverThere().click()
+        infrastructurePage.getLinkLocalHost().click()
         var infraName = UtilsModule.generate_random_string(5)
-        cy.get(infrastructurePage.inputInfraName).clear().type(infraName)
-        cy.get(infrastructurePage.inputOSType).eq(0).click().type("WINDOWS")
-        cy.get(infrastructurePage.buttonSaveInfra).click()
+        infrastructurePage.getInputInfraName().clear().type(infraName)
+        infrastructurePage.getInputOSType().eq(0).click().type("WINDOWS")
+        infrastructurePage.getButtonSaveInfra().click()
         return infraName
     }
 
     createInfraDirectory() {
-        cy.contains('Infrastructure', {timeout: 50000}).click({force: true});
-        cy.get(infrastructurePage.iconInfrastrucutre).click({force: true});
-        cy.get(infrastructurePage.linkNew).click()
-        cy.get(infrastructurePage.linkInfraDir).click()
+        infrastructurePage.getTitleInfrastructure().click({force: true})
+        infrastructurePage.getIconInfrastructure().click({force: true})
+        infrastructurePage.getLinkNew().click()
+        infrastructurePage.getLinkInfraDir().click()
         var infraDirName = UtilsModule.generate_random_string(5)
-        cy.get(infrastructurePage.inputInfraName).clear().type(infraDirName)
+        infrastructurePage.getInputInfraName().clear().type(infraDirName)
         cy.wait(3000)
-        cy.get(infrastructurePage.buttonSaveInfra).click()
+        infrastructurePage.getButtonSaveInfra().click()
         return infraDirName
     }
 
     navigateToInfraDirectory(dirName) {
-        cy.contains('Infrastructure', {timeout: 50000}).click({force: true});
-        cy.get(infrastructurePage.iconInfrastrucutre).click({force: true});
-        cy.get(infrastructurePage.linkInfraDirEditPermissions).click();
+        infrastructurePage.getTitleInfrastructure().click({force: true})
+        infrastructurePage.getIconInfrastructure().click({force: true})
+        infrastructurePage.getLinkInfraDirEditPermissions().click()
     }
 
     createInfraInsideDirectory(dirName) {
@@ -41,25 +41,26 @@ export default class infrastructureModule {
         cy.get('div.infinite-tree-item:nth-child(4) > div:nth-child(1) > a:nth-child(1)').click({force: true});
         cy.wait(3000)
         cy.contains(dirName, {timeout: 50000}).click({force: true});
-        cy.get((infrastructurePage.iconInfrastrucutre) + dirName + '"', {timeout: 10000}).click({force: true});
-        cy.get(infrastructurePage.linkNew).click()
-        cy.get(infrastructurePage.linkOverthere).click()
-        cy.get(infrastructurePage.linkLocalHost).click()
+        cy.get(infrastructurePage.getIconInfrastructureForDir() + '/' + dirName , {timeout: 10000}).click({force: true})
+        infrastructurePage.getLinkNew().click()
+        infrastructurePage.getLinkOverThere().click()
+        infrastructurePage.getLinkLocalHost().click()
         var infraName = UtilsModule.generate_random_string(5)
-        cy.get(infrastructurePage.inputInfraName).clear().type(infraName)
-        cy.get(infrastructurePage.inputOSType).eq(0).click().type("WINDOWS")
-        cy.get(infrastructurePage.buttonSaveInfra).click()
+        infrastructurePage.getInputInfraName().clear().type(infraName)
+        infrastructurePage.getInputOSType().eq(0).click().type("WINDOWS")
+        infrastructurePage.getButtonSaveInfra().click()
         return infraName
     }
 
     executeControlTask(infraName) {
-        cy.contains(infraName, {timeout: 50000}).click({force: true});
-        cy.get((infrastructurePage.iconInfrastrucutre) + infraName + '"', {timeout: 10000}).click({force: true});
+        infrastructurePage.getTitleInfrastructure().click({force: true})
+        cy.get(infrastructurePage.getIconInfrastructureForDir() + '/' + infraName + '"', {timeout: 10000}).click({force: true})
         cy.get('ul.dropdown-menu:nth-child(1) > li:nth-child(10) > a:nth-child(1) > span:nth-child(2)').click()
         cy.wait(3000)
         cy.get('.execute').click()
         cy.wait(3000)
         cy.get('button[type=button]').contains('Finish').click({force: true});
+        cy.wait(3000)
     }
 
     executeControlTaskLocalInfra(dirName, infraName) {
@@ -74,13 +75,13 @@ export default class infrastructureModule {
     }
 
     assignInfraPermissionsToRole(roleName) {
-        cy.contains('Infrastructure', {timeout: 50000}).click({force: true});
-        cy.get(infrastructurePage.iconInfrastrucutre).click({force: true});
-        cy.get(infrastructurePage.linkInfraDirEditPermissions).click()
-        cy.get(`.permissions-pagination-table-component-${roleName}-1 > input:nth-child(1)`).click()
-        cy.get(`.permissions-pagination-table-component-${roleName}-2 > input:nth-child(1)`).click()
-        cy.get(`.permissions-pagination-table-component-${roleName}-3 > input:nth-child(1)`).click()
-        cy.get((infrastructurePage.buttonSaveAndCloseInfra), {timeout: 10000}).should('be.visible')
-        cy.get(infrastructurePage.buttonSaveAndCloseInfra).click({force: true});
+        infrastructurePage.getTitleInfrastructure().click({force: true})
+        infrastructurePage.getIconInfrastructure().click({force: true});
+        infrastructurePage.getLinkInfraDirEditPermissions().click()
+        for (let i = 1; i <= 3; i++) {
+            cy.get(`.permissions-pagination-table-component-${roleName}-${i} > input:nth-child(1)`).click()
+        }
+        infrastructurePage.getButtonSaveAndCloseInfra() + ", {timeout: 10000}.should('be.visible')"
+        infrastructurePage.getButtonSaveAndCloseInfra().click({force: true});
     }
 }
