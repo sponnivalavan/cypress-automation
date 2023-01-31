@@ -91,7 +91,6 @@ export default class UserManagementPageModule {
     }
 
     changePassword(userName) {
-        cy.wait(3000)
         userManagementPage.getUserDetails(userName).click()
         cy.wait(3000)
         var password = userName + "P2"
